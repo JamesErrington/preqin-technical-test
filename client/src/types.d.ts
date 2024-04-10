@@ -11,3 +11,11 @@ interface Firm {
 	address: string;
 	postal_code: string;
 }
+
+interface Commitment {
+	id: number;
+	asset_class: string;
+	firm_id: number;
+	currency: string;
+	amount: string;
+}

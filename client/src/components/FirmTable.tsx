@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import {
 	createColumnHelper,
 	flexRender,
@@ -6,13 +7,13 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import type { FC } from "react";
+import { BASE_API } from "..";
 import "./FirmTable.css";
 
 function useFirms() {
 	return useQuery<Firm[]>({
 		queryKey: ["firms"],
-		queryFn: () =>
-			fetch("http://localhost:8000/api/investors").then((res) => res.json()),
+		queryFn: () => fetch(`${BASE_API}/investors`).then((res) => res.json()),
 		initialData: [],
 		throwOnError: true,
 		retry: false,
@@ -51,6 +52,11 @@ export const FirmTable: FC = () => {
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 	});
+	const navigate = useNavigate({ from: "/" });
+
+	function handleRowClick(firm_id: string) {
+		navigate({ to: "/investors/$investorId", params: { investorId: firm_id } });
+	}
 
 	return (
 		<div className="firm-table">
@@ -73,7 +79,11 @@ export const FirmTable: FC = () => {
 				</thead>
 				<tbody>
 					{table.getRowModel().rows.map((row) => (
-						<tr key={row.id}>
+						<tr
+							key={row.id}
+							onClick={() => handleRowClick(row.getValue("firm_id"))}
+							onKeyPress={() => handleRowClick(row.getValue("firm_id"))}
+						>
 							{row.getVisibleCells().map((cell) => (
 								<td key={cell.id}>
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
